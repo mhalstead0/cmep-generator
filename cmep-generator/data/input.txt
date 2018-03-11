@@ -1,0 +1,4 @@
+#meterId,premiseNumber,servicePointNumber,meterPointNumber,lastReadingDate,lastReading,averageDailyUsage
+A012351234,000000001,00000001,0001,2018-03-11,100.0,5.0
+A056785678,000000002,00000002,0002,2018-03-11,2000.0,10.0
+
