@@ -48,7 +48,7 @@ public class OptionsFactory {
 		INPUT_FILE('i', "input", true, true, "Input file"),
 		OUTPUT_FILE('o', "output", false, true, "Output file (defaults to stdout if not specified)"),
 		USAGE_DATE('u', "usageDate", true, true, "Usage date ('yyyy-MM-dd')"),
-		TIME_ZONE('z', "timeZOne", false, true, "Time zone (e.g. 'America/New_York', 'America/Chicago')");
+		TIME_ZONE('z', "timeZone", false, true, "Time zone (e.g. 'America/New_York', 'America/Chicago')");
 		
 		private final char character;
 		private final String longName;
