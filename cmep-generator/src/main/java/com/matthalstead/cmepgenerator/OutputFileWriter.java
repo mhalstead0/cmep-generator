@@ -2,8 +2,10 @@ package com.matthalstead.cmepgenerator;
 
 import java.io.PrintWriter;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -44,8 +46,60 @@ public class OutputFileWriter {
 		CMEPRecord registerRecord = getRegisterRecord(inputRecord, usageDate, startReading, endReading, zoneId);
 		write(registerRecord, pw);
 		
+		CMEPRecord singleIntervalRecord = getIntervalRecord(inputRecord, usageDate, startReading, endReading, zoneId);
+		List<CMEPRecord> splitIntervalRecords = getCMEPRecords(singleIntervalRecord, 48);
+		for (CMEPRecord intervalRecord : splitIntervalRecords) {
+			write(intervalRecord, pw);
+		}
 		//TODO finish
 		
+	}
+	
+	private static CMEPRecord getIntervalRecord(InputRecord inputRecord, LocalDate usageDate, BigDecimal startReading, BigDecimal endReading, ZoneId zoneId) {
+		List<CMEPRecord.Triplet> triplets = new ArrayList<>();
+		BigDecimal remainingUsage = endReading.subtract(startReading);
+		BigDecimal approxIntervalUsage = remainingUsage.divide(new BigDecimal("24.000"), Utils.ROUNDING_MODE).setScale(Utils.USAGE_SCALE, Utils.ROUNDING_MODE);
+		Instant intervalStart = Utils.getStartOfDay(usageDate, zoneId);
+		while (intervalStart.isBefore(Utils.getEndOfDay(usageDate, zoneId))) {
+			Instant intervalEnd = intervalStart.plus(1, ChronoUnit.HOURS);
+			
+			BigDecimal intervalUsage = approxIntervalUsage;
+			if (intervalUsage.compareTo(remainingUsage) > 0) {
+				intervalUsage = remainingUsage;
+			}
+			remainingUsage = remainingUsage.subtract(intervalUsage);
+			
+			CMEPRecord.Triplet triplet = new CMEPRecord.Triplet(intervalEnd, 'R', 0, intervalUsage);
+			triplets.add(triplet);
+			intervalStart = intervalEnd;
+		}
+		
+		Random r = new Random(1);
+		for (int i=0; i<100; i++) {
+			averageRandomValues(triplets, r);
+		}
+		
+		CMEPRecord result = getCommonFields(inputRecord);
+		result.setUnits("KWH");
+		result.setTriplets(triplets);
+		return result;
+	}
+	
+	private static void averageRandomValues(List<CMEPRecord.Triplet> triplets, Random r) {
+		int index1 = r.nextInt(triplets.size());
+		int index2 = r.nextInt(triplets.size());
+		if (index1 != index2) {
+			double percentToStealFrom1 = r.nextDouble();
+			double percentToStealFrom2 = r.nextDouble();
+			CMEPRecord.Triplet t1 = triplets.get(index1);
+			CMEPRecord.Triplet t2 = triplets.get(index2);
+			BigDecimal toStealFrom1 = t1.getQuantity().multiply(new BigDecimal("" + percentToStealFrom1)).setScale(Utils.USAGE_SCALE, Utils.ROUNDING_MODE);
+			BigDecimal toStealFrom2 = t2.getQuantity().multiply(new BigDecimal("" + percentToStealFrom2)).setScale(Utils.USAGE_SCALE, Utils.ROUNDING_MODE);
+			t1.setQuantity(t1.getQuantity().subtract(toStealFrom1));
+			t2.setQuantity(t2.getQuantity().subtract(toStealFrom2));
+			CMEPRecord.Triplet tMiddle = triplets.get((index1 + index2) / 2);
+			t2.setQuantity(tMiddle.getQuantity().add(toStealFrom1).add(toStealFrom2));
+		}
 	}
 	
 	private static void write(CMEPRecord cmepRecord, PrintWriter pw) {
