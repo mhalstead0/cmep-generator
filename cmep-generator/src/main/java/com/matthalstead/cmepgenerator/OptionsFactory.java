@@ -2,6 +2,7 @@ package com.matthalstead.cmepgenerator;
 
 import java.io.File;
 import java.time.LocalDate;
+import java.time.ZoneId;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
@@ -31,6 +32,10 @@ public class OptionsFactory {
 			result.setOutputFile(new File(cl.getOptionValue(OptionDef.OUTPUT_FILE.character)));
 		}
 		result.setUsageDate(LocalDate.parse(cl.getOptionValue(OptionDef.USAGE_DATE.character)));
+		if (cl.hasOption(OptionDef.TIME_ZONE.character)) {
+			String zoneIdString = cl.getOptionValue(OptionDef.TIME_ZONE.character);
+			result.setZoneId(ZoneId.of(zoneIdString));
+		}
 		return result;
 	}
 	
@@ -42,7 +47,8 @@ public class OptionsFactory {
 	public static enum OptionDef {
 		INPUT_FILE('i', "input", true, true, "Input file"),
 		OUTPUT_FILE('o', "output", false, true, "Output file (defaults to stdout if not specified)"),
-		USAGE_DATE('u', "usageDate", true, true, "Usage date ('yyyy-MM-dd')");
+		USAGE_DATE('u', "usageDate", true, true, "Usage date ('yyyy-MM-dd')"),
+		TIME_ZONE('z', "timeZOne", false, true, "Time zone (e.g. 'America/New_York', 'America/Chicago')");
 		
 		private final char character;
 		private final String longName;

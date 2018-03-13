@@ -2,12 +2,14 @@ package com.matthalstead.cmepgenerator;
 
 import java.io.File;
 import java.time.LocalDate;
+import java.time.ZoneId;
 
 public class FileGenProperties {
 
 	private File inputFile;
 	private File outputFile;
 	private LocalDate usageDate;
+	private ZoneId zoneId;
 	public File getInputFile() {
 		return inputFile;
 	}
@@ -26,7 +28,11 @@ public class FileGenProperties {
 	public void setUsageDate(LocalDate usageDate) {
 		this.usageDate = usageDate;
 	}
-	
-	
+	public ZoneId getZoneId() {
+		return zoneId;
+	}
+	public void setZoneId(ZoneId zoneId) {
+		this.zoneId = zoneId;
+	}
 	
 }

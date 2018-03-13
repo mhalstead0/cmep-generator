@@ -75,6 +75,16 @@ public class CMEPRecord {
 		private char dataQualityLetter;
 		private int dataQualityFlags;
 		private BigDecimal quantity;
+		
+		
+		
+		public Triplet(Instant timestamp, char dataQualityLetter, int dataQualityFlags, BigDecimal quantity) {
+			super();
+			this.timestamp = timestamp;
+			this.dataQualityLetter = dataQualityLetter;
+			this.dataQualityFlags = dataQualityFlags;
+			this.quantity = quantity;
+		}
 		public Instant getTimestamp() {
 			return timestamp;
 		}

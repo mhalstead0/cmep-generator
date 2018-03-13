@@ -35,7 +35,7 @@ public class Main {
 			LocalDate usageDate = fileGenProperties.getUsageDate();
 			List<InputRecord> inputRecords = InputFileParser.parseInputFile(fileGenProperties.getInputFile());
 			for (InputRecord inputRecord : inputRecords) {
-				OutputFileWriter.printOutput(inputRecord, pw, usageDate);
+				OutputFileWriter.printOutput(inputRecord, pw, usageDate, fileGenProperties.getZoneId());
 			}
 			
 			pw.flush();
